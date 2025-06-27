@@ -3,9 +3,9 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-df = pd.read_excel('https://github.com/Farhan-Nawwafal/monteCarloSimulation/blob/main/data/supplements-sales-data.xlsx')
+df = pd.read_excel('supplements-sales-data.xlsx')
 
-st.title('Simulasi Monte Carlo : Prediksi Penjualan')
+st.title('Simulasi Monte Carlo : Prediksi Penjualan Barang Suplement')
 
 home_page, analysys = st.tabs(['Main Page', 'Analisis'])
 
@@ -13,13 +13,30 @@ with home_page:
     st.header('Tim 4 IF4')
 
     col1, col2, col3 = st.columns(3)
-    col1.image('./img/idinPhoto.jpg')
-    col2.image('./img/faishalPhoto.jpg')
-    col3.image('./img/farhanPhoto.jpg')
+    with col1: 
+        col1.image('./img/idinPhoto.jpg')
+        st.write('**Idin Naufal Hakim**')
+        st.write('10123157')
+
+    with col2: 
+        col2.image('./img/faishalPhoto.jpg')
+        st.write('**Muhammad Faishal Rahmani**')
+        st.write('10123135')
+
+    with col3: 
+        col3.image('./img/farhanPhoto.jpg')
+        st.write('**Farhan Nawwafal**')
+        st.write('10123470')
+
+    st.subheader("📌 Deskripsi Tugas")
+    st.markdown("""
+    Aplikasi ini dibuat sebagai tugas dari mata kuliah Pemodelan dan Simulasi.  
+    Kelompok kami menerapkan metode **Monte Carlo Simulation** untuk memprediksi penjualan produk yang berkategori *Vitamin* selama 3 bulan ke depan berdasarkan data historis.  
+    Hasil analisis ditampilkan secara interaktif menggunakan **Streamlit**.
+    """)
+
 
 with analysys: 
-    st.header('Hasil Prediksi dan Analisis Data menggunakan Monte Carlo')
-
     st.subheader('Hasil 100 Kali Simulasi Monte Carlo')
 
     df_periode_2025 = df[df['Date'] >= '2025-01-01']
@@ -54,10 +71,18 @@ with analysys:
             simulasi[i, j] = map_to_units_sold(bil_acak[i, j],  df_simulasi)
     total_per_simulasi = simulasi.sum(axis=1)
     rata_rata_simulasi = np.mean(total_per_simulasi)
+    
+    low = np.percentile(total_per_simulasi, 2.5)
+    high = np.percentile(total_per_simulasi, 97.5)
+    st.info(f"95% prediksi penjualan akan berada antara {int(low)} dan {int(high)} units.")
 
-    st.metric("Rata-rata Penjualan", f"{np.mean(total_per_simulasi):.2f} units")
-    st.metric("Minimum", f"{np.min(total_per_simulasi)} units")
-    st.metric("Maksimum", f"{np.max(total_per_simulasi)} units")
+    col1, col2, col3 = st.columns(3)
+
+    col1.metric("Rata-rata Penjualan", f"{rata_rata_simulasi:.0f} units")
+
+    col2.metric("Minimum", f"{np.min(total_per_simulasi)} units")
+    
+    col3.metric("Maksimum", f"{np.max(total_per_simulasi)} units")
 
     fig, ax = plt.subplots()
     hist = ax.hist(total_per_simulasi, bins=30, edgecolor='blue')
@@ -66,6 +91,17 @@ with analysys:
     ax.set_xlabel('Total Units Sold')
     ax.set_ylabel('Frekuensi')
     st.pyplot(fig);
+
+    st.markdown(f"""
+    ### 🔍 Interpretasi Simulasi
+    - Rata-rata penjualan selama 3 bulan ke depan diperkirakan: **{rata_rata_simulasi:.0f} units**
+    - Ini lebih tinggi dibanding periode Jan–Mar 2025 (**147 units**), yang kemungkinan tercatat sebagian saja.
+    - 95% hasil simulasi berada antara **{int(low)} – {int(high)}**.
+""")
+
+
+
+
 
 
 
